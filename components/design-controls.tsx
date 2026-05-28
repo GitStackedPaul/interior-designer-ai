@@ -14,6 +14,7 @@ interface DesignControlsProps {
   onGenerate: () => void;
   isLoading: boolean;
   canGenerate: boolean;
+  compact?: boolean;
 }
 
 export function DesignControls({
@@ -24,7 +25,50 @@ export function DesignControls({
   onGenerate,
   isLoading,
   canGenerate,
+  compact = false,
 }: DesignControlsProps) {
+  if (compact) {
+    return (
+      <div className="flex items-center gap-2">
+        <Combobox
+          options={DESIGN_THEMES}
+          value={selectedTheme}
+          onValueChange={onThemeChange}
+          placeholder="Theme..."
+          searchPlaceholder="Search themes..."
+          emptyText="No theme found."
+          disabled={isLoading}
+        />
+        <Combobox
+          options={ROOM_TYPES}
+          value={selectedRoom}
+          onValueChange={onRoomChange}
+          placeholder="Room..."
+          searchPlaceholder="Search rooms..."
+          emptyText="No room found."
+          disabled={isLoading}
+        />
+        <Button
+          onClick={onGenerate}
+          disabled={!canGenerate || isLoading}
+          className="flex-shrink-0"
+        >
+          {isLoading ? (
+            <>
+              <Wand2 className="animate-pulse" />
+              Generating
+            </>
+          ) : (
+            <>
+              <Wand2 />
+              Generate
+            </>
+          )}
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
@@ -40,7 +84,6 @@ export function DesignControls({
             disabled={isLoading}
           />
         </div>
-
         <div className="flex flex-1 flex-col gap-3">
           <label className="text-sm font-medium">Room Type</label>
           <Combobox
@@ -54,7 +97,6 @@ export function DesignControls({
           />
         </div>
       </div>
-
       <Button
         size="lg"
         onClick={onGenerate}
