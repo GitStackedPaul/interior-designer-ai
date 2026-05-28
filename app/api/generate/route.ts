@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+function toFile(base64: string, name: string): File {
+  const data = base64.replace(/^data:image\/\w+;base64,/, "");
+  const buffer = Buffer.from(data, "base64");
+  return new File([buffer], name, { type: "image/png" });
+}
 
 export async function POST(request: Request) {
   const req = await request.json();
-  const { image, theme, room } = req;
+  const { image, composite, theme, room } = req;
 
   if (!image || !theme || !room) {
     return NextResponse.json(
@@ -16,24 +20,28 @@ export async function POST(request: Request) {
     );
   }
 
-  // Convert base64 data URL to File for the OpenAI images.edit endpoint
-  const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
-  const imageBuffer = Buffer.from(base64Data, "base64");
-  const imageFile = new File([imageBuffer], "room.png", { type: "image/png" });
+  const roomFile = toFile(image, "room.png");
+  const images: File[] = [roomFile];
 
-  const prompt = `Transform this ${room} into a ${theme} style interior design. High quality, photorealistic, editorial style photo, symmetry, natural light, 4k, award-winning interior photography`;
+  if (composite && composite !== image) {
+    images.push(toFile(composite, "composite.png"));
+  }
+
+  const hasPlacement = images.length > 1;
+  const prompt = hasPlacement
+    ? `Redesign this ${room} in ${theme} style. The second image shows furniture items placed at their intended positions in the room — incorporate those furniture pieces into the redesign at the indicated positions. High quality, photorealistic, editorial style photo, 4k.`
+    : `Transform this ${room} into a ${theme} style interior design. High quality, photorealistic, editorial style photo, symmetry, natural light, 4k, award-winning interior photography`;
 
   try {
     const response = await openai.images.edit({
       model: "gpt-image-1",
-      image: imageFile,
+      image: images.length === 1 ? images[0] : images,
       prompt,
       n: 1,
       size: "1024x1024",
     });
 
     const b64Image = response.data[0]?.b64_json;
-
     if (!b64Image) {
       return NextResponse.json(
         { error: "No image generated" },
