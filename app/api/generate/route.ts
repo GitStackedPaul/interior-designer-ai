@@ -11,7 +11,10 @@ function toFile(base64: string, name: string): File {
 
 export async function POST(request: Request) {
   const req = await request.json();
-  const { image, composite, theme, room } = req;
+  const { image, composite, theme, room, itemDescriptions } = req;
+  const descriptions: string[] = Array.isArray(itemDescriptions)
+    ? itemDescriptions
+    : [];
 
   if (!image || !theme || !room) {
     return NextResponse.json(
@@ -27,10 +30,12 @@ export async function POST(request: Request) {
     imageFiles.push(toFile(composite, "composite.png"));
   }
 
-  const hasPlacement = imageFiles.length > 1;
-  const prompt = hasPlacement
-    ? `Redesign this ${room} in ${theme} style. The second image shows furniture items placed at their intended positions in the room — incorporate those furniture pieces into the redesign at the indicated positions. High quality, photorealistic, editorial style photo, 4k.`
-    : `Transform this ${room} into a ${theme} style interior design. High quality, photorealistic, editorial style photo, symmetry, natural light, 4k, award-winning interior photography`;
+  const placementNotes =
+    descriptions.length > 0
+      ? ` Placement notes: ${descriptions.map((d, i) => `Item ${i + 1}: ${d}`).join("; ")}.`
+      : "";
+
+  const prompt = `Redesign this ${room} in ${theme} style. The second image shows furniture items placed at their intended positions in the room — incorporate those furniture pieces into the redesign at the indicated positions.${placementNotes} High quality, photorealistic, editorial style photo, 4k.`;
 
   try {
     const response = await openai.images.edit({

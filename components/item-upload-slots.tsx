@@ -9,12 +9,14 @@ interface ItemUploadSlotsProps {
   items: ItemSlot[];
   onAdd: (item: ItemSlot) => void;
   onRemove: (id: string) => void;
+  onDescriptionChange: (id: string, description: string) => void;
 }
 
 export function ItemUploadSlots({
   items,
   onAdd,
   onRemove,
+  onDescriptionChange,
 }: ItemUploadSlotsProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -30,6 +32,7 @@ export function ItemUploadSlots({
         id: crypto.randomUUID(),
         imageUrl: reader.result as string,
         filename: file.name,
+        description: "",
       });
     };
     reader.readAsDataURL(file);
@@ -37,7 +40,7 @@ export function ItemUploadSlots({
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-start gap-2">
       <input
         ref={inputRef}
         type="file"
@@ -48,20 +51,29 @@ export function ItemUploadSlots({
       {[0, 1, 2].map((i) => {
         const item = items[i];
         return item ? (
-          <div key={item.id} className="relative flex-shrink-0">
-            <div className="h-14 w-14 overflow-hidden rounded-lg border-2 border-indigo-500">
-              <img
-                src={item.imageUrl}
-                alt={item.filename}
-                className="h-full w-full object-cover"
-              />
+          <div key={item.id} className="flex w-28 flex-col gap-1">
+            <div className="relative flex-shrink-0">
+              <div className="h-14 w-14 overflow-hidden rounded-lg border-2 border-indigo-500">
+                <img
+                  src={item.imageUrl}
+                  alt={item.filename}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <button
+                onClick={() => onRemove(item.id)}
+                className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white"
+              >
+                <X className="h-2.5 w-2.5" />
+              </button>
             </div>
-            <button
-              onClick={() => onRemove(item.id)}
-              className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white"
-            >
-              <X className="h-2.5 w-2.5" />
-            </button>
+            <input
+              type="text"
+              value={item.description}
+              onChange={(e) => onDescriptionChange(item.id, e.target.value)}
+              placeholder="placement note…"
+              className="w-full rounded border border-indigo-500/30 bg-transparent px-1.5 py-0.5 font-mono text-[10px] text-white placeholder-white/30 outline-none focus:border-indigo-400"
+            />
           </div>
         ) : (
           <button

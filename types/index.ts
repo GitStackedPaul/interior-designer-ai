@@ -28,6 +28,7 @@ export interface ItemSlot {
   id: string;
   imageUrl: string; // base64 data URL
   filename: string;
+  description: string;
 }
 
 export interface Placement {

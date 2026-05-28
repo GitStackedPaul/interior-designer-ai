@@ -58,6 +58,15 @@ export default function HomePage() {
     setPlacements((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
+  const handleDescriptionChange = useCallback(
+    (id: string, description: string) => {
+      setItemSlots((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, description } : s))
+      );
+    },
+    []
+  );
+
   const handleGenerate = useCallback(async () => {
     if (!uploadedImage) return;
 
@@ -79,6 +88,9 @@ export default function HomePage() {
           composite,
           theme: selectedTheme,
           room: selectedRoom,
+          itemDescriptions: itemSlots
+            .filter((s) => s.description.trim())
+            .map((s) => s.description.trim()),
         }),
       });
 
@@ -131,6 +143,7 @@ export default function HomePage() {
               items={itemSlots}
               onAdd={handleAddItem}
               onRemove={handleRemoveItem}
+              onDescriptionChange={handleDescriptionChange}
             />
           </div>
         </CardContent>
