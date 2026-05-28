@@ -137,7 +137,7 @@ export default function HomePage() {
       </Card>
 
       {/* Main area: large canvas + right panel */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
         {/* Placement canvas — 2/3 width */}
         <div className="col-span-2">
           <PlacementCanvas
