@@ -32,10 +32,17 @@ export async function POST(request: Request) {
 
   const placementNotes =
     descriptions.length > 0
-      ? ` Placement notes: ${descriptions.map((d, i) => `Item ${i + 1}: ${d}`).join("; ")}.`
+      ? ` Per-item placement instructions (follow exactly): ${descriptions.map((d, i) => `Item ${i + 1}: ${d}`).join("; ")}.`
       : "";
 
-  const prompt = `Redesign this ${room} in ${theme} style. The second image shows furniture items placed at their intended positions in the room — incorporate those furniture pieces into the redesign at the indicated positions.${placementNotes} High quality, photorealistic, editorial style photo, 4k.`;
+  const prompt =
+    `Redesign this ${room} in ${theme} style. ` +
+    `STRICT RULES - follow all of these without exception: ` +
+    `(1) Only place the exact furniture items shown in the provided images - do not add, invent, or substitute any other objects, furniture, or decor. ` +
+    `(2) Follow every per-item placement instruction precisely.${placementNotes} ` +
+    `(3) Preserve the room's original architecture, layout, walls, floors, windows, doors, and structural elements exactly as they appear in the source photo - do not alter, remove, or rearrange them. ` +
+    `(4) Do not add anything that was not explicitly provided. ` +
+    `High quality, photorealistic, editorial style photo, 4k.`;
 
   try {
     const response = await openai.images.edit({
