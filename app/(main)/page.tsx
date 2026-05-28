@@ -43,7 +43,7 @@ export default function HomePage() {
 
   const handleAddItem = useCallback((item: ItemSlot) => {
     setItemSlots((prev) => {
-      if (prev.length >= 3) return prev;
+      if (prev.length >= 10) return prev;
       return [...prev, item];
     });
     // Place item at centre of canvas at 20% width by default
