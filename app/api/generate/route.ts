@@ -1,13 +1,20 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 export async function POST(request: Request) {
   const req = await request.json();
   const { image, theme, room } = req;
 
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
+  if (!image || !theme || !room) {
+    return NextResponse.json(
+      { error: "Missing required fields" },
+      { status: 400 }
+    );
+  }
 
   // Convert base64 data URL to File for the OpenAI images.edit endpoint
   const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
