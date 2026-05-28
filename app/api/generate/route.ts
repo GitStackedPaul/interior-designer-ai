@@ -21,13 +21,13 @@ export async function POST(request: Request) {
   }
 
   const roomFile = toFile(image, "room.png");
-  const images: File[] = [roomFile];
+  const imageFiles: File[] = [roomFile];
 
   if (composite && composite !== image) {
-    images.push(toFile(composite, "composite.png"));
+    imageFiles.push(toFile(composite, "composite.png"));
   }
 
-  const hasPlacement = images.length > 1;
+  const hasPlacement = imageFiles.length > 1;
   const prompt = hasPlacement
     ? `Redesign this ${room} in ${theme} style. The second image shows furniture items placed at their intended positions in the room — incorporate those furniture pieces into the redesign at the indicated positions. High quality, photorealistic, editorial style photo, 4k.`
     : `Transform this ${room} into a ${theme} style interior design. High quality, photorealistic, editorial style photo, symmetry, natural light, 4k, award-winning interior photography`;
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   try {
     const response = await openai.images.edit({
       model: "gpt-image-1",
-      image: images.length === 1 ? images[0] : images,
+      image: imageFiles.length === 1 ? imageFiles[0] : imageFiles,
       prompt,
       n: 1,
       size: "1024x1024",
