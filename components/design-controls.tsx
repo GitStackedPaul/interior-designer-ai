@@ -38,6 +38,7 @@ export function DesignControls({
           searchPlaceholder="Search themes..."
           emptyText="No theme found."
           disabled={isLoading}
+          className="w-44"
         />
         <Combobox
           options={ROOM_TYPES}
@@ -47,6 +48,7 @@ export function DesignControls({
           searchPlaceholder="Search rooms..."
           emptyText="No room found."
           disabled={isLoading}
+          className="w-36"
         />
         <Button
           onClick={onGenerate}

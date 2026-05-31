@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -91,6 +92,15 @@ export function AppSidebar({ variant }: Props) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter className="p-3">
+        <img
+          src="/rina-logo.png"
+          alt="Rina Marais Interiors"
+          className="w-full opacity-100 grayscale"
+          draggable={false}
+        />
+      </SidebarFooter>
     </Sidebar>
   );
 }

@@ -124,7 +124,7 @@ export default function HomePage() {
 
       {/* Top bar: design controls + item slots */}
       <Card>
-        <CardContent className="flex flex-wrap items-center gap-4 py-3">
+        <CardContent className="flex flex-col gap-3 py-3">
           <DesignControls
             compact
             selectedTheme={selectedTheme}
@@ -135,7 +135,7 @@ export default function HomePage() {
             isLoading={isLoading}
             canGenerate={!!uploadedImage}
           />
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 border-t pt-3">
             <span className="font-mono text-[10px] text-indigo-400">
               ITEMS TO PLACE
             </span>
@@ -162,27 +162,27 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Right panel — 1/3 width */}
-        <div className="flex flex-col gap-3">
-          <div>
-            <p className="text-muted-foreground mb-1.5 text-xs font-medium">
-              Room Photo
-            </p>
-            {uploadedImage ? (
-              <UploadedImage src={uploadedImage} onRemove={handleRemoveImage} />
-            ) : (
-              <ImageDropzone
-                onImageUpload={handleImageUpload}
-                onError={handleError}
-              />
-            )}
-          </div>
-          <div className="flex-1">
-            <p className="text-muted-foreground mb-1.5 text-xs font-medium">
-              AI Design
-            </p>
-            <OutputImage src={outputImage} isLoading={isLoading} />
-          </div>
+        {/* Right panel — 1/3 width (room photo only) */}
+        <div>
+          <p className="text-muted-foreground mb-1.5 text-xs font-medium">
+            Room Photo
+          </p>
+          {uploadedImage ? (
+            <UploadedImage src={uploadedImage} onRemove={handleRemoveImage} />
+          ) : (
+            <ImageDropzone
+              onImageUpload={handleImageUpload}
+              onError={handleError}
+            />
+          )}
+        </div>
+
+        {/* AI Design — same width as canvas, directly below */}
+        <div className="col-span-2">
+          <p className="text-muted-foreground mb-1.5 text-xs font-medium">
+            AI Design
+          </p>
+          <OutputImage src={outputImage} isLoading={isLoading} />
         </div>
       </div>
     </div>

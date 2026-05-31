@@ -73,7 +73,7 @@ export function ItemUploadSlots({
             value={item.description}
             onChange={(e) => onDescriptionChange(item.id, e.target.value)}
             placeholder="placement note…"
-            className="w-full rounded border border-indigo-500/30 bg-transparent px-1.5 py-0.5 font-mono text-[10px] text-white placeholder-white/30 outline-none focus:border-indigo-400"
+            className="text-foreground placeholder:text-muted-foreground w-full rounded border border-indigo-500/30 bg-transparent px-1.5 py-0.5 font-mono text-[10px] outline-none focus:border-indigo-400"
           />
         </div>
       ))}

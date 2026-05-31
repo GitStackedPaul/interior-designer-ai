@@ -142,16 +142,4 @@
   body {
     @apply bg-background text-foreground;
   }
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image: url("/rina-logo.png");
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: 480px auto;
-    opacity: 0.045;
-    pointer-events: none;
-    z-index: 0;
-  }
 }
