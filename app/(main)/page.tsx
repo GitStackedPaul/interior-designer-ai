@@ -11,7 +11,8 @@ import { PlacementCanvas } from "@/components/placement-canvas";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { CircleAlert } from "lucide-react";
-import type { RoomType, DesignTheme, ItemSlot, Placement } from "@/types";
+import { ITEM_COLORS, ITEM_COLOR_NAMES } from "@/lib/constants";
+import type { RoomType, DesignTheme, ItemSlot } from "@/types";
 
 export default function HomePage() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -21,7 +22,7 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [itemSlots, setItemSlots] = useState<ItemSlot[]>([]);
-  const [placements, setPlacements] = useState<Placement[]>([]);
+  const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const getCompositeRef = useRef<(() => Promise<string>) | null>(null);
 
   const handleImageUpload = useCallback((base64: string) => {
@@ -46,16 +47,12 @@ export default function HomePage() {
       if (prev.length >= 10) return prev;
       return [...prev, item];
     });
-    // Place item at centre of canvas at 20% width by default
-    setPlacements((prev) => [
-      ...prev,
-      { id: item.id, x: 0.4, y: 0.4, width: 0.2, height: 0.2 },
-    ]);
+    setActiveItemId(item.id);
   }, []);
 
   const handleRemoveItem = useCallback((id: string) => {
     setItemSlots((prev) => prev.filter((s) => s.id !== id));
-    setPlacements((prev) => prev.filter((p) => p.id !== id));
+    setActiveItemId((prev) => (prev === id ? null : prev));
   }, []);
 
   const handleDescriptionChange = useCallback(
@@ -76,9 +73,16 @@ export default function HomePage() {
 
     try {
       let composite = uploadedImage;
-      if (placements.length > 0 && getCompositeRef.current) {
+      if (getCompositeRef.current) {
         composite = await getCompositeRef.current();
       }
+
+      const items = itemSlots.map((s, i) => ({
+        description: s.description.trim(),
+        colorName: ITEM_COLOR_NAMES[i % ITEM_COLOR_NAMES.length],
+      }));
+
+      const itemImages = itemSlots.map((s) => s.imageUrl);
 
       const response = await fetch("/api/generate", {
         method: "POST",
@@ -88,9 +92,8 @@ export default function HomePage() {
           composite,
           theme: selectedTheme,
           room: selectedRoom,
-          itemDescriptions: itemSlots
-            .filter((s) => s.description.trim())
-            .map((s) => s.description.trim()),
+          items,
+          itemImages,
         }),
       });
 
@@ -110,7 +113,7 @@ export default function HomePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [uploadedImage, placements, selectedTheme, selectedRoom, handleError]);
+  }, [uploadedImage, itemSlots, selectedTheme, selectedRoom, handleError]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -122,7 +125,7 @@ export default function HomePage() {
         </Alert>
       )}
 
-      {/* Top bar: design controls + item slots */}
+      {/* Top bar: generate controls */}
       <Card>
         <CardContent className="flex flex-col gap-3 py-3">
           <DesignControls
@@ -137,32 +140,34 @@ export default function HomePage() {
           />
           <div className="flex flex-col gap-1 border-t pt-3">
             <span className="font-mono text-[10px] text-indigo-400">
-              ITEMS TO PLACE
+              ITEMS TO PLACE — click an item to select it, then draw on the
+              canvas below
             </span>
             <ItemUploadSlots
               items={itemSlots}
+              activeItemId={activeItemId}
               onAdd={handleAddItem}
               onRemove={handleRemoveItem}
               onDescriptionChange={handleDescriptionChange}
+              onActiveChange={setActiveItemId}
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Main area: large canvas + right panel */}
+      {/* Main area: drawing canvas + right panel */}
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-        {/* Placement canvas — 2/3 width */}
+        {/* Drawing canvas — 2/3 width */}
         <div className="col-span-2">
           <PlacementCanvas
             roomImage={uploadedImage}
             items={itemSlots}
-            placements={placements}
-            onPlacementsChange={setPlacements}
+            activeItemId={activeItemId}
             getCompositeRef={getCompositeRef}
           />
         </div>
 
-        {/* Right panel — 1/3 width (room photo only) */}
+        {/* Right panel — room photo */}
         <div>
           <p className="text-muted-foreground mb-1.5 text-xs font-medium">
             Room Photo
@@ -177,7 +182,7 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* AI Design — same width as canvas, directly below */}
+        {/* AI Design — same width as canvas */}
         <div className="col-span-2">
           <p className="text-muted-foreground mb-1.5 text-xs font-medium">
             AI Design

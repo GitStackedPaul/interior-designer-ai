@@ -30,6 +30,7 @@ export function DesignControls({
   if (compact) {
     return (
       <div className="flex items-center gap-2">
+        {/* theme/room selectors disabled — kept for future re-enable
         <Combobox
           options={DESIGN_THEMES}
           value={selectedTheme}
@@ -50,6 +51,7 @@ export function DesignControls({
           disabled={isLoading}
           className="w-36"
         />
+        */}
         <Button
           onClick={onGenerate}
           disabled={!canGenerate || isLoading}
