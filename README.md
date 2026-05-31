@@ -2,90 +2,72 @@
 
 ![interior-design-image](public/app-screenshot.png)
 
-A modern, AI-powered application for transforming interior spaces with cutting-edge design. Upload a photo of your room and get a redesigned space in seconds.
+AI-powered interior design tool. Upload a room photo, place furniture items, and generate a photorealistic redesign using OpenAI `gpt-image-1`.
 
 ## Features
 
-- **Modern UI** with glassmorphism effects and fluid animations
-- **AI-Powered Design** transformation using Replicate API
-- **Multiple Design Styles** including Modern, Vintage, Minimalist, and Professional
-- **Various Room Types** such as Living Room, Dining Room, Bedroom, Bathroom, and Office
-- **Responsive Design** that works on both desktop and mobile devices
+- AI redesign via OpenAI `gpt-image-1`
+- Multiple design styles and room types
+- Drag-and-drop furniture placement with per-item placement notes
+- Up to 10 furniture items per generation
+- PWA installable — works as a desktop app on Windows, Mac, and mobile
 
-## How to use
+## Local Development
 
-### 1. Clone this project's repository
-
-In your Terminal app
+### 1. Install Bun
 
 ```bash
-# Clone the repo
-git clone git@github.com:siegblink/interior-designer-ai.git
-```
-
-### 2. Install Bun (if not already installed)
-
-**Bun** is a fast JavaScript runtime and package manager. Install it using:
-
-```bash
-# macOS/Linux
-curl -fsSL https://bun.sh/install | bash
-
 # Windows
 powershell -c "irm bun.sh/install.ps1 | iex"
+
+# macOS/Linux
+curl -fsSL https://bun.sh/install | bash
 ```
 
-For more installation options, visit [https://bun.sh/docs/installation](https://bun.sh/docs/installation)
+### 2. Install dependencies
 
-### 3. Install the project dependencies
-
-Go to the project's directory
-
-- Type `cd interior-designer-ai`
-- Then, `bun install`
-
-### 4. Create an account at [replicate](https://replicate.com/)
-
-![create-account-in-replicate](public/create-account-in-replicate.png)
-
-### 5. Go to the _API tokens_ page within your replicate account
-
-![go-to-api-tokens](public/go-to-api-tokens.png)
-
-### 6. Create your API token and copy it
-
-![create-api-token](public/create-api-token.png)
-
-### 7. Rename the `.env.example` file to `.env.local`
-
-### 8. In `.env.local`, replace the placeholder _your_api_token_ with your API token
-
-```
-# Replace 'your-api-token' with your own API token from replicate
-REPLICATE_API_TOKEN=your-api-token
+```bash
+bun install
 ```
 
-### 9. Run the project
+### 3. Set up environment
 
-Back in your Terminal in the project directory, type `bun dev`
+```bash
+cp .env.example .env.local
+# Edit .env.local — add your OpenAI API key
+# Get a key at https://platform.openai.com/api-keys
+```
 
-### 10. See the running application in your browser at `localhost:3000`
+### 4. Run
 
-![see-running-app](public/see-running-app.png)
+```bash
+bun dev
+```
 
-## Technologies Used
+Open [http://localhost:3000](http://localhost:3000).
 
-- **Next.js 16** - React framework for production
-- **React 19** - UI component library
-- **Tailwind CSS 4** - Utility-first CSS framework
-- **shadcn/ui** - Accessible UI component library built on Radix UI
-- **cmdk** - Command menu for searchable dropdowns
-- **Replicate API** - For AI-powered design transformations
+## Deploy to Vercel
 
-## Contributing
+1. Push to GitHub
+2. Go to [vercel.com/new](https://vercel.com/new) and import the repo
+3. In Vercel dashboard → **Settings → Environment Variables**, add:
+   - `OPENAI_API_KEY` = your OpenAI API key (Production + Preview)
+4. Deploy
 
-Contributions are welcome! Please check out our [contribution guidelines](CONTRIBUTING.md) first.
+The API key stays server-side — it is never exposed to the browser.
 
-## License
+## Install as a Desktop App (PWA)
 
-This project is open source and available under the [MIT License](LICENSE).
+Once deployed, open the URL in **Chrome or Edge**:
+
+1. Look for the **Install** icon in the address bar (or the ⊕ icon in the toolbar)
+2. Click **Install**
+3. A desktop shortcut is created — the app opens in its own window with no browser chrome
+
+## Tech Stack
+
+- **Next.js 16** · **React 19** · **TypeScript**
+- **Tailwind CSS 4** · **shadcn/ui**
+- **OpenAI SDK** — `gpt-image-1` image editing
+- **Bun** — runtime and package manager
+- **Vercel** — hosting

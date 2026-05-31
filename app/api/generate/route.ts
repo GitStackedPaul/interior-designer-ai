@@ -53,7 +53,7 @@ export async function POST(request: Request) {
       size: "1024x1024",
     });
 
-    const b64Image = response.data[0]?.b64_json;
+    const b64Image = response.data?.[0]?.b64_json;
     if (!b64Image) {
       return NextResponse.json(
         { error: "No image generated" },
