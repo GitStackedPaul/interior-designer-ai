@@ -14,6 +14,27 @@ import { CircleAlert } from "lucide-react";
 import { ITEM_COLORS, ITEM_COLOR_NAMES } from "@/lib/constants";
 import type { RoomType, DesignTheme, ItemSlot } from "@/types";
 
+async function compressImage(
+  base64: string,
+  maxDim: number,
+  quality = 0.85
+): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(maxDim / img.width, maxDim / img.height, 1);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas
+        .getContext("2d")!
+        .drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", quality));
+    };
+    img.src = base64;
+  });
+}
+
 export default function HomePage() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [outputImage, setOutputImage] = useState<string | null>(null);
@@ -82,7 +103,12 @@ export default function HomePage() {
         colorName: ITEM_COLOR_NAMES[i % ITEM_COLOR_NAMES.length],
       }));
 
-      const itemImages = itemSlots.map((s) => s.imageUrl);
+      // Compress before sending to keep payload under server limits
+      const [compressedComposite, ...itemImages] = await Promise.all([
+        compressImage(composite, 1024),
+        ...itemSlots.map((s) => compressImage(s.imageUrl, 512)),
+      ]);
+      composite = compressedComposite;
 
       const response = await fetch("/api/generate", {
         method: "POST",
